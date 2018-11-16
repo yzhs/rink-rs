@@ -464,7 +464,7 @@ impl Context {
     pub fn humanize<Tz: TimeZone>(&self, date: DateTime<Tz>) -> Option<String> {
         if self.use_humanize {
             use chrono_humanize::HumanTime;
-            Some(format!("{}", HumanTime::from(date)))
+            Some(format!("{}", HumanTime::from(date - UTC::now())))
         } else {
             None
         }
