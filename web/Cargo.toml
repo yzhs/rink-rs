@@ -27,8 +27,8 @@ mount = "0.3"
 params = "0.6"
 handlebars = "0.26"
 handlebars-iron = "0.24"
-staticfile = "0.4"
-limiter = "0.3"
+staticfile = "0.5.0"
+limiter = "0.3.2"
 logger = "0.3"
 
 [dependencies.rink]
