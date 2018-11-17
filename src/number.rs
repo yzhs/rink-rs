@@ -25,8 +25,8 @@ pub struct Dim(pub Rc<String>);
 #[cfg(feature = "nightly")]
 impl ::serde::ser::Serialize for Dim {
     fn serialize<S>(
-        &self, serializer: &mut S
-    ) -> Result<(), S::Error>
+        &self, serializer: S
+    ) -> Result<S::Ok, S::Error>
     where S: ::serde::ser::Serializer {
         serializer.serialize_str(&**self.0)
     }

@@ -6,7 +6,6 @@ use rink;
 use rink::reply::{QueryReply, QueryError};
 use std::os::unix::process::ExitStatusExt;
 use std::io;
-use rustc_serialize;
 use serde_json;
 use serde::ser::{Serialize, Serializer};
 
@@ -20,15 +19,15 @@ pub enum Error {
 
 impl Serialize for Error {
     fn serialize<S>(
-        &self, ser: &mut S
-    ) -> Result<(), S::Error> where S: Serializer {
+        &self, ser: S
+    ) -> Result<S::Ok, S::Error> where S: Serializer {
         match *self {
             Error::Rink(ref e) =>
                 ser.serialize_newtype_variant("Error", 0, "Rink", e),
             Error::Time =>
-                ser.serialize_newtype_variant("Error", 1, "Time", true),
+                ser.serialize_newtype_variant("Error", 1, "Time", &true),
             Error::Memory =>
-                ser.serialize_newtype_variant("Error", 2, "Memory", true),
+                ser.serialize_newtype_variant("Error", 2, "Memory", &true),
             Error::Generic(ref e) =>
                 ser.serialize_newtype_variant("Error", 3, "Generic", e),
         }
@@ -130,7 +129,7 @@ pub fn eval_text(query: &str) -> String {
     }
 }
 
-pub fn eval_json(query: &str) -> rustc_serialize::json::Json {
+pub fn eval_json(query: &str) -> serde_json::Value {
     let res = eval(query);
-    rustc_serialize::json::Json::from_str(&serde_json::ser::to_string(&res).unwrap()).unwrap()
+    serde_json::from_str(&serde_json::ser::to_string(&res).unwrap()).unwrap()
 }
