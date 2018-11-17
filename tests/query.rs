@@ -569,3 +569,23 @@ fn test_formula() {
     );
     test("C60", "C60: molar_mass = 0.72066 kilogram / mole");
 }
+
+#[test]
+fn test_timezone_difference() {
+    test(
+        "#2018-11-17 07:03:15 +00:00# - #2018-11-17 07:03:15 +02:00#",
+        "0 second (time)"
+    );
+    test(
+        "#2018-11-17 07:03:15 +08:00# - #2018-11-17 07:03:15 Europe/Berlin#",
+        "1 hour, 0 second (time)"
+    );
+    test(
+        "#2018-11-17 07:03:15 Europe/Berlin# - #2018-11-17 07:03:15 Asia/Tokyo#",
+        "8 hour, 0 second (time)"
+    );
+    test(
+        "#2018-11-17 07:03:15 Europe/Berlin# - #2018-11-17 07:03:15 +08:00#",
+        "-1 hour, 0 second (time)"
+    );
+}
