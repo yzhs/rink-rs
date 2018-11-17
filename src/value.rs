@@ -3,7 +3,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 use number::Number;
-use chrono::{DateTime, FixedOffset};
+use chrono::{DateTime, FixedOffset, TimeZone};
 use chrono_tz::Tz;
 use context::Context;
 use substance::Substance;
@@ -84,10 +84,10 @@ impl<'a,'b> Add<&'b Value> for &'a Value {
             (&Value::DateTime(ref left), &Value::Number(ref right)) |
             (&Value::Number(ref right), &Value::DateTime(ref left)) =>
                 match *left {
-                    GenericDateTime::Fixed(left) => left.checked_add(try!(date::to_duration(
+                    GenericDateTime::Fixed(left) => left.checked_add_signed(try!(date::to_duration(
                         right
                     ))).map(GenericDateTime::Fixed),
-                    GenericDateTime::Timezone(left) => left.checked_add(try!(date::to_duration(
+                    GenericDateTime::Timezone(left) => left.checked_add_signed(try!(date::to_duration(
                         right
                     ))).map(GenericDateTime::Timezone),
                 }
@@ -113,10 +113,10 @@ impl<'a,'b> Sub<&'b Value> for &'a Value {
             (&Value::DateTime(ref left), &Value::Number(ref right)) |
             (&Value::Number(ref right), &Value::DateTime(ref left)) =>
                 match *left {
-                    GenericDateTime::Fixed(left) => left.checked_sub(try!(date::to_duration(
+                    GenericDateTime::Fixed(left) => left.checked_sub_signed(try!(date::to_duration(
                         right
                     ))).map(GenericDateTime::Fixed),
-                    GenericDateTime::Timezone(left) => left.checked_sub(try!(date::to_duration(
+                    GenericDateTime::Timezone(left) => left.checked_sub_signed(try!(date::to_duration(
                         right
                     ))).map(GenericDateTime::Timezone),
                 }
@@ -126,12 +126,16 @@ impl<'a,'b> Sub<&'b Value> for &'a Value {
                 date::from_duration(&match (left, right) {
                     (&GenericDateTime::Fixed(ref left), &GenericDateTime::Fixed(ref right)) =>
                         *left - *right,
-                    (&GenericDateTime::Fixed(ref left), &GenericDateTime::Timezone(ref right)) =>
-                        *left - *right,
+                    (&GenericDateTime::Fixed(ref left), &GenericDateTime::Timezone(ref right)) => {
+                        let tz = TimeZone::from_offset(left.offset());
+                        *left - right.with_timezone(&tz)
+                    }
                     (&GenericDateTime::Timezone(ref left), &GenericDateTime::Timezone(ref right)) =>
                         *left - *right,
-                    (&GenericDateTime::Timezone(ref left), &GenericDateTime::Fixed(ref right)) =>
-                        *left - *right,
+                    (&GenericDateTime::Timezone(ref left), &GenericDateTime::Fixed(ref right)) => {
+                        let tz = TimeZone::from_offset(left.offset());
+                        *left - right.with_timezone(&tz)
+                    }
                 })
                 .map(Value::Number),
             (_, _) => Err(format!("Operation is not defined"))

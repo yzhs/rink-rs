@@ -4,7 +4,8 @@
 
 use ast::{DatePattern, DateToken, show_datepattern};
 use chrono::format::Parsed;
-use chrono::{Weekday, DateTime, UTC, FixedOffset, Duration, Date, TimeZone};
+use chrono::offset::{Utc, Local, TimeZone};
+use chrono::{Weekday, DateTime, FixedOffset, Duration, Date};
 use context::Context;
 use number::{Number, Dim};
 use num::Num;
@@ -298,7 +299,7 @@ fn attempt(date: &[DateToken], pat: &[DatePattern]) -> Result<GenericDateTime, (
                     "Datetime does not represent a valid moment in time"
                 ), count)).map(GenericDateTime::Timezone),
             (Ok(time), Err(_)) =>
-                Ok(UTC::now().with_timezone(&tz).date().and_time(time).unwrap()).map(
+                Ok(Utc::now().with_timezone(&tz).date().and_time(time).unwrap()).map(
                     GenericDateTime::Timezone),
             (Err(_), Ok(date)) =>
                 tz.from_local_date(&date).earliest().map(|x| x.and_hms(0, 0, 0)).ok_or_else(|| (format!(
@@ -314,7 +315,7 @@ fn attempt(date: &[DateToken], pat: &[DatePattern]) -> Result<GenericDateTime, (
                     date.and_time(time), offset
                 ))),
             (Ok(time), Err(_)) =>
-                Ok(GenericDateTime::Fixed(UTC::now().with_timezone(
+                Ok(GenericDateTime::Fixed(Utc::now().with_timezone(
                     &offset
                 ).date().and_time(time).unwrap())),
             (Err(_), Ok(date)) =>
@@ -381,7 +382,7 @@ pub fn from_duration(duration: &Duration) -> Result<Number, String> {
 }
 
 pub fn now() -> DateTime<FixedOffset> {
-    UTC::now().with_timezone(&FixedOffset::east(0))
+    Utc::now().with_timezone(&FixedOffset::east(0))
 }
 
 pub fn parse_datepattern<I>(iter: &mut Peekable<I>)
@@ -464,7 +465,8 @@ impl Context {
     pub fn humanize<Tz: TimeZone>(&self, date: DateTime<Tz>) -> Option<String> {
         if self.use_humanize {
             use chrono_humanize::HumanTime;
-            Some(format!("{}", HumanTime::from(date - UTC::now())))
+            let tz: Tz = TimeZone::from_offset(date.offset());
+            Some(format!("{}", HumanTime::from(date - Local::now().with_timezone(&tz))))
         } else {
             None
         }

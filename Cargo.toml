@@ -18,9 +18,9 @@ nightly = ["serde", "serde_derive"]
 
 [dependencies]
 rust-gmp = "0.5.0"
-chrono = "0.2.25"
+chrono = "0.4.6"
 strsim = "0.8.0"
-chrono-tz = "0.2.2"
+chrono-tz = "0.5.0"
 chrono-humanize = { version = "0.0.11", optional = true }
 linefeed = { version = "0.4.0", optional = true }
 hyper = { version = "0.10.10", optional = true }
