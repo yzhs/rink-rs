@@ -21,15 +21,15 @@ serde = { version = "1.0.80", features = ["rc"] }
 url = "1.7.2"
 toml = "0.4"
 # iron crates
-iron = "0.5"
-router = "0.5"
-mount = "0.3"
-params = "0.6"
-handlebars = "0.26"
-handlebars-iron = "0.24"
+iron = "0.6.0"
+router = "0.6"
+mount = "0.4"
+params = "0.8"
+handlebars = "0.32"
+handlebars-iron = "0.26"
 staticfile = "0.5.0"
-limiter = "0.3.2"
-logger = "0.3"
+limiter = { version = "0.4", git = "https://github.com/yzhs/limiter" }
+logger = "0.4"
 
 [dependencies.rink]
 path = "../"
