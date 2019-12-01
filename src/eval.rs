@@ -547,7 +547,7 @@ impl Context {
                 value = rem;
             }
         }
-        Ok(list.into_iter().zip(out.into_iter()).map(|(name, value)| {
+        Ok(list.iter().zip(out.into_iter()).map(|(name, value)| {
             let pretty = Number {
                 value,
                 unit: Number::one_unit(Dim::new(name)).unit

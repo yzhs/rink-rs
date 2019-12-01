@@ -440,8 +440,6 @@ impl Number {
     }
 
     pub fn pow(&self, exp: &Number) -> Result<Number, String> {
-        use std::convert::Into;
-
         if !exp.dimless() {
             return Err("Exponent must be dimensionless".to_string())
         }
